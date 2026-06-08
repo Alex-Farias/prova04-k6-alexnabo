@@ -15,8 +15,7 @@ export const options = {
   },
   stages: [
     { duration: '10s', target: 2 },
-    { duration: '10s', target: 4 },
-    { duration: '10s', target: 6 }
+    { duration: '15s', target: 5 }
   ]
 };
 
@@ -28,7 +27,7 @@ export function handleSummary(data) {
 }
 
 export default function () {
-  const baseUrl = 'https://test.k6.io/';
+  const baseUrl = 'https://petstore.swagger.io/v2/store/inventory';
 
   const params = {
     headers: {
