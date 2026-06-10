@@ -4,18 +4,19 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
 
-export const getContactsDuration = new Trend('get_contacts', true);
+export const getPostsDuration = new Trend('get_posts', true);
 export const RateContentOK = new Rate('content_OK');
 
 export const options = {
   thresholds: {
-    http_req_failed: ['rate<0.30'],
-    get_contacts: ['p(99)<500'],
-    content_OK: ['rate>0.95']
+    http_req_failed: ['rate<0.25'],
+    get_posts: ['p(90)<6800']
   },
   stages: [
-    { duration: '10s', target: 2 },
-    { duration: '15s', target: 5 }
+    { duration: '30s', target: 7 },
+    { duration: '60s', target: 46 },
+    { duration: '60s', target: 92 },
+    { duration: '40s', target: 0 }
   ]
 };
 
@@ -27,7 +28,7 @@ export function handleSummary(data) {
 }
 
 export default function () {
-  const baseUrl = 'https://petstore.swagger.io/v2/store/inventory';
+  const baseUrl = 'https://jsonplaceholder.typicode.com';
 
   const params = {
     headers: {
@@ -37,13 +38,13 @@ export default function () {
 
   const OK = 200;
 
-  const res = http.get(`${baseUrl}`, params);
+  const res = http.get(`${baseUrl}/posts`, params);
 
-  getContactsDuration.add(res.timings.duration);
+  getPostsDuration.add(res.timings.duration);
 
   RateContentOK.add(res.status === OK);
 
   check(res, {
-    'GET Contacts - Status 200': () => res.status === OK
+    'GET Posts - Status 200': () => res.status === OK
   });
 }
